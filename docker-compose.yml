@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  metastore:
+    container_namer: postgres_metastore
+    image: postgres:12.0-alpine
+    enviroment:
+      - POSTGRES_PASSWORD: ${pg_pass}
+      - POSTGRES_USER: ${pg_user}
+      - POSTGRES_DB: ${pg_db}
+  
+  zookeeper:
+    container: zookeeper
+    image: zookeeper
+    enviroment:
+      - ZOO_MY_ID=1
+      - ZOO_SERVERS=zookepper
+
+  coordinator:
+    container_name: druid_cooridinator
+    enviroment:
+      - ZOOKEEPER_SERVER=zookeeper
+      - DRUID_SERVICE=coordinator
+      - DRUID_HOST=zookeeper
+      - DRUID_SERVICE_HOST=8081
+      - DRUID_JVM_ARGS="-server -Xms256m -Xmx256m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dderby.stream.error.file=var/druid/derby.log"
+    
+    depends_on:
+      - zookeeper
+      
+
